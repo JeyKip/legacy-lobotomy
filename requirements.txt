@@ -1,0 +1,12 @@
+Django==3.2.7
+djangorestframework==3.12.4
+django-cors-headers==3.9.0
+django-rest-auth==0.9.5
+django-file-resubmit==0.5.2
+django-nested-inline==0.4.4
+Jinja2==3.0.1
+psycopg2==2.9.1
+python-magic==0.4.24
+StringGenerator==0.4.4
+requests==2.26.0
+Pillow==8.3.2
