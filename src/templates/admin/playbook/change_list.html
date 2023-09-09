@@ -1,0 +1,139 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+&rsaquo; {% if add %}{% blocktranslate with name=opts.verbose_name %}Add {{ name }}{% endblocktranslate %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}<div id="content-main">
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+    {% block object-tools-items %}
+      {% change_form_object_tools %}
+    {% endblock %}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+<div>
+{% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+{% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+{% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+{% if errors %}
+    <p class="errornote">
+    {% if errors|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+    </p>
+    {{ adminform.form.non_field_errors }}
+{% endif %}
+
+{% block field_sets %}
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" %}
+{% endfor %}
+{% endblock %}
+
+{% block after_field_sets %}{% endblock %}
+
+{% block inline_field_sets %}
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+{% endblock %}
+
+{% block after_related_objects %}{% endblock %}
+
+{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+{% block admin_change_form_document_ready %}
+    <script id="django-admin-form-add-constants"
+            src="{% static 'admin/js/change_form.js' %}"
+            {% if adminform and add %}
+                data-model-name="{{ opts.model_name }}"
+            {% endif %}
+            async>
+    </script>
+{% endblock %}
+
+{# JavaScript for prepopulated fields #}
+{% prepopulated_fields_js %}
+
+</div>
+</form></div>
+    <script>
+
+        var blocks_id_exists = 0
+        var blocks_id_text_flag = true
+        while(blocks_id_text_flag){
+            if(document.getElementById("blocks-"+blocks_id_exists+"-text-0") != null){
+                const td = document.getElementById("blocks-"+blocks_id_exists+"-text-0").querySelector('td:nth-child(2)');
+                if(td.children[0].innerHTML.length == 0){
+                    document.getElementById("blocks-"+blocks_id_exists+"-text-0").closest(".module").closest('tr').style.display = 'none';
+                }
+                blocks_id_exists++;
+            } else {
+                blocks_id_text_flag = false
+            }
+        }
+
+        var image_id_exists = 0
+        var image_id_flag = true
+
+        while(image_id_flag){
+            if(document.getElementById("id_blocks-"+image_id_exists+"-image-0-image") != null){
+                if(document.getElementById("id_blocks-"+image_id_exists+"-image-0-image").files.length == 0){
+                    document.getElementById("id_blocks-"+image_id_exists+"-image-0-image").closest(".module").closest('tr').style.display = 'none';
+                }
+                image_id_exists++;
+            } else {
+                image_id_flag = false
+            }
+        }
+
+        var video_id_exists = 0
+        var video_id_flag = true
+
+        while(video_id_flag){
+            if(document.getElementById("id_blocks-"+video_id_exists+"-video-0-video") != null){
+                if(document.getElementById("id_blocks-"+video_id_exists+"-video-0-video").files.length == 0){
+                    document.getElementById("id_blocks-"+video_id_exists+"-video-0-video").closest(".module").closest('tr').style.display = 'none';
+                }
+                video_id_exists++;
+            } else {
+                video_id_flag = false
+            }
+        }
+
+        var question_id_exists = 0
+        var question_id_flag = true
+        while(question_id_flag){
+            if(document.getElementById("blocks-"+question_id_exists+"-question-0") != null){
+                const td = document.getElementById("blocks-"+question_id_exists+"-question-0").querySelector('td:nth-child(2)');
+                if(td.children[0].innerHTML.length == 0){
+                    document.getElementById("blocks-"+question_id_exists+"-question-0").closest(".module").closest('tr').style.display = 'none';
+                }
+                question_id_exists++;
+            } else {
+                question_id_flag = false
+            }
+        }
+    </script>
+{% endblock %}

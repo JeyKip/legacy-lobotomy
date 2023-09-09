@@ -1,0 +1,8 @@
+{% extends 'admin/change_form.html' %}
+
+{% block object-tools-items %}
+{{ block.super }}
+<li>
+    <a href="{% url 'admin:teamchat_teamchat_changelist' %}?team__id__exact={{ object_id }}" class="btn btn-high btn-info">Team Chat</a>
+</li>
+{% endblock %}

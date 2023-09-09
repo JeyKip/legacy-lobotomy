@@ -1,0 +1,33 @@
+{% extends 'admin/base.html' %}
+
+{% block extrahead %}{{ block.super }}
+<style>
+    /*
+    ul.messagelist li.error {
+        color: white !important;
+    }*/
+    #changelist-filter [title="-"] {
+        display: none !important;
+    }
+    #add_id_dependent_on {
+        display: none !important;
+    }
+    .submit-row .closelink {
+        display:none !important;
+    }
+    :root {
+        --primary: #9774d5;
+        --secondary: #785cab;
+        --link-fg: #7c449b;
+        --link-selected-fg: #8f5bb2;
+        --body-fg: #333;
+        --body-bg: #fff;
+        --body-quiet-color: #666;
+        --body-loud-color: #000;
+        --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
+        --selected-bg: #e4e4e4; /* E.g. selected table cells */
+        --selected-row: #ffc;
+    }
+
+</style>
+{% endblock %}

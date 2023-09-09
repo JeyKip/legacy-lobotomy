@@ -1,0 +1,21 @@
+{% extends "admin/submit_line.html" %}
+
+{% block submit-row %}
+
+{{ block.super }}
+
+<a onclick="goBack()"><input type="button" name="Cancel" value="Cancel"></a>
+<script>
+    function goBack() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const popUp = urlParams.get('_popup')
+        console.log(popUp);
+        if (popUp) {
+            window.close();
+        } else {
+          window.history.back();
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'admin/change_list.html' %}
+{% load i18n admin_urls admin_list %}
+
+{% block object-tools %}
+    {{ block.super }}
+    <script>
+    (function ($) {
+        $(document).ready(
+            function () {
+                $('input:submit').attr('disabled', true);
+                $('input:file').change(
+                    function () {
+                        if ($(this).val()) {
+                            $('input:submit').removeAttr('disabled');
+                        } else {
+                            $('input:submit').attr('disabled', true);
+                        }
+                    });
+            })
+    })(django.jQuery);
+    </script>
+
+    <div>
+        <h3>Bulk Upload</h3>
+        <form id="upload-csv-form" action="{% url 'admin:bulk_upload' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
+            <p>{{ form.non_field_errors }}</p>
+            <p>{{ submit_csv_form.as_p }}</p>
+            <p>{{ submit_csv_form.csv_file.errors }}</p>
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <p><input type="submit" value="Upload" />
+                <input type="reset" value="Reset"></p>
+        </form>
+    </div>
+    <br/>
+
+
+{% endblock %}
