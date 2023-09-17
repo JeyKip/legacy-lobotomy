@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=legacy-lobotomy-db
+      - POSTGRES_USER=legacy-lobotomy-user
+      - POSTGRES_PASSWORD=legacy-lobotomy-password
+    ports:
+      - "5432:5432"
+
+volumes:
+  db:
