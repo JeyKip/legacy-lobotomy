@@ -2,6 +2,7 @@ Django==3.2.7
 djangorestframework==3.12.4
 django-allauth==0.45.0
 django-cors-headers==3.9.0
+django-environ==0.11.2
 django-rest-auth==0.9.5
 django-file-resubmit==0.5.2
 django-nested-inline==0.4.4
