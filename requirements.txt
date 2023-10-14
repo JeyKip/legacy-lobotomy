@@ -1,5 +1,6 @@
 Django==3.2.7
 djangorestframework==3.12.4
+django-allauth==0.45.0
 django-cors-headers==3.9.0
 django-rest-auth==0.9.5
 django-file-resubmit==0.5.2
