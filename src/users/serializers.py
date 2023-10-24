@@ -56,6 +56,13 @@ class PasswordResetSerializer(RAPasswordResetSerializer):
             'subject_template_name': 'registration/password_reset_subject.txt'
         }
 
+    def validate_email(self, value):
+        self.reset_form = self.password_reset_form_class(data=self.initial_data)
+        if not self.reset_form.is_valid() and 'email' in self.reset_form.errors:
+            raise serializers.ValidationError(self.reset_form.errors['email'])
+
+        return value
+
 
 class PasswordResetConfirmSerializer(RAPasswordResetConfirmSerializer):
     new_password1 = serializers.CharField(max_length=128, trim_whitespace=False)
