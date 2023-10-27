@@ -47,13 +47,16 @@ class TestPasswordReset:
 
     @pytest.mark.django_db
     @patch.object(default_token_generator, 'make_token')
+    @pytest.mark.parametrize('secure, expected_schema', [(True, 'https'), (False, 'http')])
     def test_when_user_with_specified_email_exists_then_password_reset_email_should_be_sent(
-            self, make_token_mock, faker, uid, user, client, mailoutbox
+            self, make_token_mock, faker, uid, user, client, mailoutbox, settings, secure, expected_schema, site
     ):
+        settings.SITE_ID = site.pk
+
         password_reset_token = faker.pystr()
         make_token_mock.return_value = password_reset_token
 
-        response = client.post(self.reset_password_endpoint, {'email': user.email})
+        response = client.post(self.reset_password_endpoint, {'email': user.email}, secure=secure)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {'detail': 'Password reset e-mail has been sent.'}
@@ -61,21 +64,19 @@ class TestPasswordReset:
         [email] = mailoutbox
         [alternative_content, alternative_type] = email.alternatives[0]
 
-        assert email.subject == 'Password reset on Legacy Lobotomy'
+        assert email.subject == f'Password reset on {site.name}'
         assert email.to == [user.email]
 
         assert email.body.strip() == f'''
-You're receiving this email because you requested a password reset for your user account at example.com.
+You're receiving this email because you requested a password reset for your user account.
 
-Please go to the following page and choose a new password:
+Please click on the following link and choose a new password:
 
-http://example.com/auth/password-reset-confirm/{uid(user.pk)}/{password_reset_token}/
+{expected_schema}://{site.domain}/password-reset-confirm/{uid(user.pk)}/{password_reset_token}/
 
-Your username, in case you’ve forgotten: {user.email}
+Your email, in case you’ve forgotten: {user.email}
 
 Thanks for using our site!
-
-The example.com team
 '''.strip()
 
         assert alternative_content.strip() == f'''
@@ -83,7 +84,7 @@ You're receiving this email because you requested a password reset for your user
 <br>
 Please click on the following link and choose a new password:
 <br>
-<a href="https://legacy-Lobotomy-be.com/password-reset-confirm/{uid(user.pk)}/{password_reset_token}/">https://legacy-lobotomy-be.com/password-reset-confirm/{uid(user.pk)}/{password_reset_token}/</a>
+<a href="{expected_schema}://{site.domain}/password-reset-confirm/{uid(user.pk)}/{password_reset_token}/">{expected_schema}://{site.domain}/password-reset-confirm/{uid(user.pk)}/{password_reset_token}/</a>
 <br>
 Your email, in case you’ve forgotten: {user.email}
 <br>
