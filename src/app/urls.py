@@ -3,7 +3,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from rest_auth.views import PasswordResetView
 from rest_framework.routers import DefaultRouter
 
 from users.views import (
@@ -38,7 +37,6 @@ urlpatterns = [
          name='rest_password_reset_confirm'),
     path('auth/login/', LoginView.as_view(), name='rest_login'),
     path('auth/', include('rest_auth.urls')),
-    path('auth/password-reset/', PasswordResetView.as_view()),
     path('auth/password-reset-confirm/<uidb64>/<token>/',
          PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('admin/', admin.site.urls),

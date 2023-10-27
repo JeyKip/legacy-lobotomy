@@ -1,7 +1,7 @@
 from django.db.models import Q
 from rest_auth.models import TokenModel
 from rest_auth.serializers import (
-    PasswordResetSerializer as RAPasswordResetSerializer,
+    PasswordResetSerializer as RestAuthPasswordResetSerializer,
     PasswordResetConfirmSerializer as RAPasswordResetConfirmSerializer,
     LoginSerializer as RALoginSerializer
 )
@@ -49,11 +49,10 @@ class LoginSerializer(RALoginSerializer):
                                      trim_whitespace=False)
 
 
-class PasswordResetSerializer(RAPasswordResetSerializer):
+class PasswordResetSerializer(RestAuthPasswordResetSerializer):
     def get_email_options(self):
         return {
-            'html_email_template_name': 'registration/email_password_reset_confirm.html',
-            'subject_template_name': 'registration/password_reset_subject.txt'
+            'html_email_template_name': 'registration/email_password_reset_confirm.html'
         }
 
     def validate_email(self, value):
