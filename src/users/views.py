@@ -1,5 +1,4 @@
 from rest_auth.views import (
-    PasswordResetConfirmView as RAPasswordResetConfirmView,
     LoginView as RALoginView
 )
 from rest_framework import viewsets
@@ -10,17 +9,13 @@ from rest_framework.response import Response
 from .models import User, Team
 from .permissions import IsNotSuperuser
 from .serializers import (
-    PasswordResetConfirmSerializer, UserSerializer, TeamDashboardSerializer,
+    UserSerializer, TeamDashboardSerializer,
     LoginSerializer
 )
 
 
 class LoginView(RALoginView):
     serializer_class = LoginSerializer
-
-
-class PasswordResetConfirmView(RAPasswordResetConfirmView):
-    serializer_class = PasswordResetConfirmSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
