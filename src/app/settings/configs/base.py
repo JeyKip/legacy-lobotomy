@@ -89,6 +89,7 @@ REST_AUTH_SERIALIZERS = {
     'TOKEN_SERIALIZER': 'users.serializers.TokenSerializer',
     'PASSWORD_RESET_SERIALIZER': 'users.serializers.PasswordResetSerializer',
     'PASSWORD_RESET_CONFIRM_SERIALIZER': 'users.serializers.PasswordResetConfirmSerializer',
+    'LOGIN_SERIALIZER': 'users.serializers.LoginSerializer',
 }
 
 TEMPLATES = [

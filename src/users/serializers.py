@@ -3,7 +3,7 @@ from rest_auth.models import TokenModel
 from rest_auth.serializers import (
     PasswordResetSerializer as RestAuthPasswordResetSerializer,
     PasswordResetConfirmSerializer as RestAuthPasswordResetConfirmSerializer,
-    LoginSerializer as RALoginSerializer
+    LoginSerializer as RestAuthLoginSerializer
 )
 from rest_framework import serializers
 
@@ -44,9 +44,8 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('key', 'user')
 
 
-class LoginSerializer(RALoginSerializer):
-    password = serializers.CharField(style={'input_type': 'password'},
-                                     trim_whitespace=False)
+class LoginSerializer(RestAuthLoginSerializer):
+    password = serializers.CharField(style={'input_type': 'password'}, trim_whitespace=False)
 
 
 class PasswordResetSerializer(RestAuthPasswordResetSerializer):

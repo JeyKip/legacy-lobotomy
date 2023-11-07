@@ -1,4 +1,3 @@
-from rest_auth.views import LoginView as RALoginView
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -6,11 +5,7 @@ from rest_framework.response import Response
 
 from .models import User, Team
 from .permissions import IsNotSuperuser
-from .serializers import UserSerializer, TeamDashboardSerializer, LoginSerializer
-
-
-class LoginView(RALoginView):
-    serializer_class = LoginSerializer
+from .serializers import UserSerializer, TeamDashboardSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
