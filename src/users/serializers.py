@@ -2,7 +2,7 @@ from django.db.models import Q
 from rest_auth.models import TokenModel
 from rest_auth.serializers import (
     PasswordResetSerializer as RestAuthPasswordResetSerializer,
-    PasswordResetConfirmSerializer as RAPasswordResetConfirmSerializer,
+    PasswordResetConfirmSerializer as RestAuthPasswordResetConfirmSerializer,
     LoginSerializer as RALoginSerializer
 )
 from rest_framework import serializers
@@ -63,7 +63,7 @@ class PasswordResetSerializer(RestAuthPasswordResetSerializer):
         return value
 
 
-class PasswordResetConfirmSerializer(RAPasswordResetConfirmSerializer):
+class PasswordResetConfirmSerializer(RestAuthPasswordResetConfirmSerializer):
     new_password1 = serializers.CharField(max_length=128, trim_whitespace=False)
     new_password2 = serializers.CharField(max_length=128, trim_whitespace=False)
 
