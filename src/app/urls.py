@@ -5,10 +5,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from users.views import (
-    UserViewSet,
-    TeamDashboardViewSet
-)
+from users.views import UserDetailsView, TeamDashboardViewSet
 from other.views import TermsAndConditionsViewSet
 
 from assignments.apiviews import (
@@ -19,7 +16,6 @@ from assignments.apiviews import (
 )
 
 router = DefaultRouter()
-router.register('users', UserViewSet)
 router.register('team-dashboard', TeamDashboardViewSet, 'Team Dashboard')
 router.register('terms-conditions', TermsAndConditionsViewSet, 'Terms and Conditions')
 router.register('assignments', AssingmentViewSet)
@@ -34,6 +30,7 @@ urlpatterns = [
         name='password_reset_confirm'
     ),
     path('reset_done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('auth/user/', UserDetailsView.as_view()),
     path('auth/', include('rest_auth.urls')),
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),

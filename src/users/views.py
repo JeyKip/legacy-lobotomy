@@ -1,30 +1,30 @@
+from rest_auth.views import UserDetailsView as RestAuthUserDetailsView
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.mixins import DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
-from .models import User, Team
+from .models import Team
 from .permissions import IsNotSuperuser
 from .serializers import (
-    UserSerializer, TeamDashboardSerializer
+    TeamDashboardSerializer
 )
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated, IsNotSuperuser)
+class UserDetailsView(DestroyModelMixin, RestAuthUserDetailsView):
+    def get_permissions(self):
+        if self.request.method.lower() == 'get':
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [IsAuthenticated, IsNotSuperuser]
 
-    def update(self, request, *args, **kwargs):
-        data = request.data
-        instance = self.get_object()
-        if instance.first_login:
-            data['first_login'] = False
-        serializer = UserSerializer(instance, data=data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+        return super().get_permissions()
+
+    def perform_update(self, serializer):
+        serializer.save(first_login=False)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
 
 
 class TeamDashboardViewSet(viewsets.ModelViewSet):
@@ -40,4 +40,3 @@ class TeamDashboardViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Team.objects.filter(pk=self.request.user.team.id)
-
