@@ -27,6 +27,15 @@ class UserSerializer(serializers.ModelSerializer):
             'first_login',
             'is_superuser'
         )
+        read_only_fields = ('email', 'accepted_terms_cond', 'total_points', 'first_login', 'is_superuser')
+        extra_kwargs = {
+            'first_name': {'required': True, 'allow_blank': False},
+            'last_name': {'required': True, 'allow_blank': False},
+            'gender': {'required': True, 'allow_blank': False, 'allow_null': False},
+            'guardian_email': {'required': True, 'allow_blank': False, 'allow_null': False},
+            'age': {'required': True, 'allow_null': False},
+            'activity': {'required': True, 'allow_blank': False, 'allow_null': False},
+        }
 
 
 
