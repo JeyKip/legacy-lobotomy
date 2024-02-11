@@ -68,16 +68,21 @@ class AssingmentSerializer(ModelSerializer):
         model = Assignment
         fields = '__all__'
 
+    # todo: this property is not needed for playbook
+    # todo: it will not work with playbook because obj.dependent_on points to PlaybookAssignment and from time to time this field will have random incorrect assignment name
     def get_dependent_on_name(self, obj):
         if obj.dependent_on:
             assignment = Assignment.objects.filter(id=obj.dependent_on.id).first()
             if assignment:
                 return assignment.name
 
+    # todo: we don't need this method and extra call
     def get_category(self, obj):
         category = Category.objects.get(id=obj.category.id)
         return CategorySerializer(category, many=False).data
 
+    # todo: it is not needed for playbook since all assignments in playbook are passed + it's not used in the app for the playbook screen
+    # todo: it will not work with playbook because UserAssignment.assignment_id points to Assigment model, but obj belongs to PlaybookAssignment and from time to time this field will have random values of True or False
     def get_locked(self, obj):
         request = self.context.get('request', None)
         if request:
@@ -91,6 +96,7 @@ class AssingmentSerializer(ModelSerializer):
         return AssignmentBlockSerializer(blocks, many=True).data
 
 
+# todo: unused
 class PlaybookAssignmentsSerializer(AssingmentSerializer):
     is_completed = SerializerMethodField(source='get_is_completed')
 

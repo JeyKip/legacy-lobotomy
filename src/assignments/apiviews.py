@@ -38,6 +38,7 @@ class UserDiscoverViewSet(ModelViewSet):
         return queryset
 
     def update(self, request, *args, **kwargs):
+        # todo: in case of questions, a correct answer is checked by the app which is not correct, because we should not trust the client, but in order to change this approach we need to add more API methods
         if request.data.get('is_completed'):
             userassignment = UserAssignment.objects.get(
                 assignment=kwargs['pk'], user=request.user.id)

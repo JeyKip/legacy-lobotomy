@@ -27,6 +27,7 @@ class AssingmentTarget(models.Model):
 
     name = models.CharField(max_length=255, unique=True, null=False,
                             blank=False)
+    # todo: there is no validation for max value, should we use it?
     min_age = models.PositiveSmallIntegerField(default=13, null=True,
                                                blank=True,
                                                validators=[validate_min_age, ])

@@ -11,6 +11,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
 
     email = factory.Sequence(lambda n: f'fake-user-{n}@fakemail.com')
+    password = factory.django.Password('123456')
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     age = factory.Faker('pyint', min_value=13, max_value=99)
@@ -21,11 +22,3 @@ class UserFactory(factory.django.DjangoModelFactory):
     total_points = factory.Faker('pyint')
     first_login = factory.Faker('pybool')
     is_superuser = False
-
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        user = super()._create(model_class, *args, **kwargs)
-        user.set_password(user.password)
-        user.save()
-
-        return user
