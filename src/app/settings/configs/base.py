@@ -13,9 +13,8 @@ import os
 import environ
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
-ROOT_DIR = BASE_DIR.parent
+ROOT_DIR = Path(os.path.dirname(os.path.realpath(__name__)))
+BASE_DIR = ROOT_DIR / 'src'
 
 env = environ.Env()
 
@@ -193,6 +192,6 @@ CACHES = {
     },
     'file_resubmit': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/tmp/file_resubmit/'
+        'LOCATION': env.str('FILE_RESUBMIT_LOCATION')
     },
 }
