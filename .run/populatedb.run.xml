@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/manage.py" />
-    <option name="PARAMETERS" value="populatedb --users-count 100 --categories-count 10 --assignment-targets-count 10 --assignments-count 600 --generate-playbook-assignments" />
+    <option name="PARAMETERS" value="populatedb --users-count 100 --categories-count 10 --assignment-targets-count 10 --assignments-count 600 --generate-playbook-assignments --clean-database" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

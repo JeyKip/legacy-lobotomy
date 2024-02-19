@@ -9,11 +9,12 @@ from assignments.factories import (
     AssignmentFactory, AssignmentTargetFactory, CategoryFactory, ImageBlockFactory, OptionFactory, QuestionBlockFactory,
     TextBlockFactory, VideoBlockFactory
 )
-from assignments.models import AssingmentTarget, Category
+from assignments.models import Assignment, AssingmentTarget, Category
 from playbooks.factories import (
     PlaybookAssignmentFactory, PlaybookImageBlockFactory, PlaybookOptionFactory, PlaybookQuestionBlockFactory,
     PlaybookTextBlockFactory, PlaybookVideoBlockFactory
 )
+from playbooks.models import PlaybookAssignment
 from users.factories import UserFactory
 
 User = get_user_model()
@@ -305,10 +306,9 @@ class GeneratePlaybookAssignmentsCommandHandler:
 
     def execute(self):
         if self._generate_playbook_assignments:
-            users = list(User.objects.filter(is_superuser=False).all())
             assignment_categories = list(Category.objects.all())
 
-            for user in users:
+            for user in User.objects.filter(is_superuser=False).iterator(chunk_size=500):
                 for _ in range(random.randint(5, 50)):
                     self._generate_playbook_assignment(user, assignment_categories)
 
@@ -343,8 +343,41 @@ class GeneratePlaybookAssignmentsCommandHandler:
             self._success_cb(f'Playbook assignment with name {assignment.name} was generated successfully')
 
 
+class CleanDatabaseCommandHandler:
+    @staticmethod
+    def add_arguments(parser):
+        parser.add_argument(
+            '--clean-database',
+            action='store_true',
+            help='A flag that shows if all the data in the database should be cleaned out before generating data.'
+                 ' If missed, existing data will not be touched.'
+        )
+
+    def __init__(
+            self,
+            clean_database,
+            success_cb,
+            **kwargs
+    ):
+        self._clean_database = clean_database
+        self._success_cb = success_cb
+
+    def execute(self):
+        if self._clean_database:
+            Assignment.objects.all().delete()
+            AssingmentTarget.objects.all().delete()
+            PlaybookAssignment.objects.all().delete()
+            Category.objects.all().delete()
+            User.objects.filter(is_superuser=False).delete()
+
+            self._success_cb('Database was cleaned successfully.')
+        else:
+            self._success_cb('Database cleaning was skipped.')
+
+
 class Command(BaseCommand):
     handlers = [
+        CleanDatabaseCommandHandler,
         GenerateUsersCommandHandler,
         GenerateCategoriesCommandHandler,
         GenerateAssignmentTargetsCommandHandler,
