@@ -74,7 +74,7 @@ Please click on the following link and choose a new password:
 
 {expected_schema}://{site.domain}/password-reset-confirm/{uid(user.pk)}/{password_reset_token}/
 
-Your email, in case you’ve forgotten: {user.email}
+Your email, in case you've forgotten: {user.email}
 
 Thanks for using our site!
 '''.strip()
