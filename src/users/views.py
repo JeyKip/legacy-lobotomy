@@ -1,6 +1,4 @@
-from rest_auth.views import (
-    LoginView as RALoginView
-)
+from rest_auth.views import LoginView as RALoginView
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -8,10 +6,7 @@ from rest_framework.response import Response
 
 from .models import User, Team
 from .permissions import IsNotSuperuser
-from .serializers import (
-    UserSerializer, TeamDashboardSerializer,
-    LoginSerializer
-)
+from .serializers import UserSerializer, TeamDashboardSerializer, LoginSerializer
 
 
 class LoginView(RALoginView):
@@ -48,4 +43,3 @@ class TeamDashboardViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Team.objects.filter(pk=self.request.user.team.id)
-
