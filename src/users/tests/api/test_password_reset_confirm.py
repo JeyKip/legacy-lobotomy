@@ -9,6 +9,10 @@ from rest_framework import status
 
 
 class TestPasswordResetConfirm:
+    SYMBOL_POSITION_BEGINNING = 'beginning'
+    SYMBOL_POSITION_MIDDLE = 'middle'
+    SYMBOL_POSITION_ENDING = 'ending'
+
     # 2. Define an endpoint which should handle requests for changing the password
     reset_password_confirm_endpoint = '/auth/password/reset/confirm/'
 
@@ -28,7 +32,7 @@ class TestPasswordResetConfirm:
     password_without_special_symbol = 'StrongPassword1'
 
     # 8. A list of possible locations of the symbol in the string
-    symbol_positions = ['beginning', 'middle', 'ending']
+    symbol_positions = [SYMBOL_POSITION_BEGINNING, SYMBOL_POSITION_MIDDLE, SYMBOL_POSITION_ENDING]
 
     # 9. Define a fixture with a valid body for changing the password of the user passed as an argument
     @pytest.fixture
@@ -42,9 +46,9 @@ class TestPasswordResetConfirm:
 
     # 10. A helper method which inserts a tested symbol into the tested password value
     def _insert_symbol_into_string(self, destination, symbol, position):
-        if position == 'beginning':
+        if position == self.SYMBOL_POSITION_BEGINNING:
             return f'{symbol}{destination}'
-        if position == 'ending':
+        if position == self.SYMBOL_POSITION_ENDING:
             return f'{destination}{symbol}'
 
         index = random.randint(1, len(destination) - 1)
