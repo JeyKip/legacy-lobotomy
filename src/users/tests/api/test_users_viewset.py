@@ -7,8 +7,11 @@ User = get_user_model()
 
 class TestUsersViewSet:
     @pytest.mark.django_db
-    def test_any_authenticated_user_can_see_the_list_of_all_users_in_the_system(self, auth_client, user, user_factory):
+    def test_any_authenticated_user_can_see_the_list_of_all_users_in_the_system(
+            self, user, user_factory, auth_client_factory
+    ):
         another_user = user_factory()
+        auth_client = auth_client_factory(user)
 
         response = auth_client.get('/api/users/')
         returned_users = {item['pk'] for item in response.json()}
@@ -17,8 +20,11 @@ class TestUsersViewSet:
         assert returned_users == {user.pk, another_user.pk}
 
     @pytest.mark.django_db
-    def test_any_authenticated_user_can_see_details_of_any_user_in_the_system(self, auth_client, user_factory):
+    def test_any_authenticated_user_can_see_details_of_any_user_in_the_system(
+            self, user, user_factory, auth_client_factory
+    ):
         another_user = user_factory()
+        auth_client = auth_client_factory(user)
 
         response = auth_client.get(f'/api/users/{another_user.pk}/')
 
@@ -26,10 +32,11 @@ class TestUsersViewSet:
         assert response.json()['pk'] == another_user.pk
 
     @pytest.mark.django_db
-    def test_any_authenticated_user_can_make_themselves_a_superuser(self, auth_client_factory, user_factory):
+    def test_any_authenticated_user_can_make_themselves_a_superuser(self, user_factory, auth_client_factory):
         # first_login=False is used to work around a bug with attempt to change request data
         user = user_factory(is_superuser=False, first_login=False)
         auth_client = auth_client_factory(user)
+
         response = auth_client.patch(f'/api/users/{user.pk}/', {'is_superuser': True})
 
         user.refresh_from_db()
@@ -39,7 +46,9 @@ class TestUsersViewSet:
         assert user.is_superuser
 
     @pytest.mark.django_db
-    def test_any_authenticated_user_can_make_another_user_a_superuser(self, auth_client, user_factory):
+    def test_any_authenticated_user_can_make_another_user_a_superuser(self, user, user_factory, auth_client_factory):
+        auth_client = auth_client_factory(user)
+
         # first_login=False is used to work around a bug with attempt to change request data
         another_user = user_factory(is_superuser=False, first_login=False)
         response = auth_client.patch(f'/api/users/{another_user.pk}/', {'is_superuser': True})
@@ -53,8 +62,9 @@ class TestUsersViewSet:
         assert another_user.is_superuser
 
     @pytest.mark.django_db
-    def test_any_authenticated_user_can_delete_another_user(self, auth_client, user_factory):
+    def test_any_authenticated_user_can_delete_another_user(self, user, user_factory, auth_client_factory):
         another_user = user_factory()
+        auth_client = auth_client_factory(user)
 
         response = auth_client.delete(f'/api/users/{another_user.pk}/')
 

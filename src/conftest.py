@@ -15,11 +15,6 @@ def client():
 
 
 @pytest.fixture
-def auth_client(user, auth_client_factory):
-    return auth_client_factory(user)
-
-
-@pytest.fixture
 def auth_client_factory():
     def auth_client(user):
         from rest_framework.authtoken.models import Token
