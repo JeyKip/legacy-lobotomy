@@ -12,3 +12,13 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     email = factory.LazyFunction(lambda: f'fake-user-{uuid.uuid4().hex}@fakemail.com')
     password = factory.django.Password('123456')
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
+    age = factory.Faker('pyint', min_value=13, max_value=99)
+    gender = factory.Faker('random_element', elements=[item[0] for item in User.GENDER_CHOICES])
+    guardian_email = factory.Faker('email')
+    accepted_terms_cond = factory.Faker('pybool')
+    activity = factory.Faker('random_element', elements=[item[0] for item in User.ACTIVITY_CHOICES])
+    total_points = factory.Faker('pyint')
+    first_login = factory.Faker('pybool')
+    is_superuser = False  # by default this factory should create regular users

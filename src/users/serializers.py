@@ -27,6 +27,13 @@ class UserSerializer(serializers.ModelSerializer):
             'first_login',
             'is_superuser'
         )
+        read_only_fields = (
+            'email',
+            'accepted_terms_cond',
+            'total_points',
+            'first_login',
+            'is_superuser'
+        )
 
 
 

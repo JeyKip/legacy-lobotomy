@@ -12,16 +12,22 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated, IsNotSuperuser)
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            self.permission_classes = (IsAuthenticated,)
+        else:
+            self.permission_classes = (IsAuthenticated, IsNotSuperuser)
+
+        return super().get_permissions()
+
+    def get_queryset(self):
+        return User.objects.filter(pk=self.request.user.id)
 
     def update(self, request, *args, **kwargs):
-        data = request.data
-        instance = self.get_object()
-        if instance.first_login:
-            data['first_login'] = False
-        serializer = UserSerializer(instance, data=data, partial=True)
+        serializer = UserSerializer(self.get_object(), data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(first_login=False)
         return Response(serializer.data)
 
 
