@@ -12,6 +12,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     authentication_classes = (TokenAuthentication,)
+    http_method_names = ['get', 'put', 'delete']
 
     def get_permissions(self):
         if self.action == 'retrieve':
@@ -25,7 +26,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return User.objects.filter(pk=self.request.user.id)
 
     def update(self, request, *args, **kwargs):
-        serializer = UserSerializer(self.get_object(), data=request.data, partial=True)
+        serializer = UserSerializer(self.get_object(), data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(first_login=False)
         return Response(serializer.data)
