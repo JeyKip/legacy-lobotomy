@@ -36,12 +36,12 @@ class TestPasswordResetConfirm:
 
     # 9. Define a fixture with a valid body for changing the password of the user passed as an argument
     @pytest.fixture
-    def valid_request_body(self, user, uid):
+    def valid_request_body(self, regular_user, uid):
         return {
             'new_password1': self.valid_password,
             'new_password2': self.valid_password,
-            'uid': uid(user.pk),
-            'token': default_token_generator.make_token(user),
+            'uid': uid(regular_user.pk),
+            'token': default_token_generator.make_token(regular_user),
         }
 
     # 10. A helper method which inserts a tested symbol into the tested password value
@@ -186,58 +186,58 @@ class TestPasswordResetConfirm:
     @pytest.mark.parametrize('symbol_position', symbol_positions)
     @pytest.mark.parametrize('symbol', list(string.digits))
     def test_when_password_has_digit_at_any_position_it_should_be_saved(
-            self, symbol_position, symbol, user, valid_request_body, client
+            self, symbol_position, symbol, regular_user, valid_request_body, client
     ):
         password = self._insert_symbol_into_string(self.password_without_digit, symbol, symbol_position)
         request_body = {**valid_request_body, 'new_password1': password, 'new_password2': password}
         response = client.post(self.reset_password_confirm_endpoint, request_body)
 
-        user.refresh_from_db()
+        regular_user.refresh_from_db()
 
         assert response.status_code == status.HTTP_200_OK
-        assert user.check_password(password)
+        assert regular_user.check_password(password)
 
     @pytest.mark.django_db
     @pytest.mark.parametrize('symbol_position', symbol_positions)
     @pytest.mark.parametrize('symbol', list(string.ascii_lowercase))
     def test_when_password_has_lowercase_letter_at_any_position_it_should_be_saved(
-            self, symbol_position, symbol, user, valid_request_body, client
+            self, symbol_position, symbol, regular_user, valid_request_body, client
     ):
         password = self._insert_symbol_into_string(self.password_without_lowercase_letter, symbol, symbol_position)
         request_body = {**valid_request_body, 'new_password1': password, 'new_password2': password}
         response = client.post(self.reset_password_confirm_endpoint, request_body)
 
-        user.refresh_from_db()
+        regular_user.refresh_from_db()
 
         assert response.status_code == status.HTTP_200_OK
-        assert user.check_password(password)
+        assert regular_user.check_password(password)
 
     @pytest.mark.django_db
     @pytest.mark.parametrize('symbol_position', symbol_positions)
     @pytest.mark.parametrize('symbol', list(string.ascii_uppercase))
     def test_when_password_has_uppercase_letter_at_any_position_it_should_be_saved(
-            self, symbol_position, symbol, user, valid_request_body, client
+            self, symbol_position, symbol, regular_user, valid_request_body, client
     ):
         password = self._insert_symbol_into_string(self.password_without_uppercase_letter, symbol, symbol_position)
         request_body = {**valid_request_body, 'new_password1': password, 'new_password2': password}
         response = client.post(self.reset_password_confirm_endpoint, request_body)
 
-        user.refresh_from_db()
+        regular_user.refresh_from_db()
 
         assert response.status_code == status.HTTP_200_OK
-        assert user.check_password(password)
+        assert regular_user.check_password(password)
 
     @pytest.mark.django_db
     @pytest.mark.parametrize('symbol_position', symbol_positions)
     @pytest.mark.parametrize('symbol', list(string.punctuation))
     def test_when_password_has_special_symbol_at_any_position_it_should_be_saved(
-            self, symbol_position, symbol, user, valid_request_body, client
+            self, symbol_position, symbol, regular_user, valid_request_body, client
     ):
         password = self._insert_symbol_into_string(self.password_without_special_symbol, symbol, symbol_position)
         request_body = {**valid_request_body, 'new_password1': password, 'new_password2': password}
         response = client.post(self.reset_password_confirm_endpoint, request_body)
 
-        user.refresh_from_db()
+        regular_user.refresh_from_db()
 
         assert response.status_code == status.HTTP_200_OK
-        assert user.check_password(password)
+        assert regular_user.check_password(password)

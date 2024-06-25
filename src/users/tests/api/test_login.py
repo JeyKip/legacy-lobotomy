@@ -51,9 +51,9 @@ class TestLogin:
         ),
     ])
     def test_when_credentials_are_invalid_then_400_bad_request_status_should_be_returned(
-            self, user_email, user_password, login_email, login_password, user_factory, client
+            self, user_email, user_password, login_email, login_password, regular_user_factory, client
     ):
-        user_factory(email=user_email, password=user_password)
+        regular_user_factory(email=user_email, password=user_password)
         response = client.post(self.login_endpoint, {'email': login_email, 'password': login_password})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -63,10 +63,10 @@ class TestLogin:
 
     @pytest.mark.django_db
     def test_when_credentials_are_valid_then_token_and_user_details_should_be_returned(
-            self, faker, user_factory, client
+            self, faker, regular_user_factory, client
     ):
         password = faker.pystr()
-        user = user_factory(password=password)
+        user = regular_user_factory(password=password)
 
         response = client.post(self.login_endpoint, {'email': user.email, 'password': password})
 

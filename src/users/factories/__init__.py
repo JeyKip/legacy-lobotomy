@@ -1,2 +1,3 @@
 from .site import SiteFactory
-from .user import UserFactory
+from .team import TeamFactory
+from .user import AdminUserFactory, RegularUserFactory

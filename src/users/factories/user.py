@@ -3,6 +3,8 @@ import uuid
 import factory
 from django.contrib.auth import get_user_model
 
+from .team import TeamFactory
+
 User = get_user_model()
 
 
@@ -21,4 +23,14 @@ class UserFactory(factory.django.DjangoModelFactory):
     activity = factory.Faker('random_element', elements=[item[0] for item in User.ACTIVITY_CHOICES])
     total_points = factory.Faker('pyint')
     first_login = factory.Faker('pybool')
-    is_superuser = False  # by default this factory should create regular users
+
+
+class AdminUserFactory(UserFactory):
+    is_superuser = True
+    is_staff = True
+
+
+class RegularUserFactory(UserFactory):
+    is_superuser = False
+    is_staff = False
+    team = factory.SubFactory(TeamFactory)
