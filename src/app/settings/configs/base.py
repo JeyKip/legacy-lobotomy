@@ -90,6 +90,7 @@ REST_AUTH_SERIALIZERS = {
     'PASSWORD_RESET_SERIALIZER': 'users.serializers.PasswordResetSerializer',
     'PASSWORD_RESET_CONFIRM_SERIALIZER': 'users.serializers.PasswordResetConfirmSerializer',
     'LOGIN_SERIALIZER': 'users.serializers.LoginSerializer',
+    'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
 }
 
 TEMPLATES = [
