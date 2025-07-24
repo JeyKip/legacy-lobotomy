@@ -1,7 +1,7 @@
 import pytest
 from pytest_factoryboy import register
 
-from assignments.factories import CategoryFactory
+from assignments.factories import AssignmentTargetFactory, CategoryFactory
 from users.factories import AdminUserFactory, RegularUserFactory, SiteFactory, TeamFactory
 
 # Register user factories
@@ -12,6 +12,7 @@ register(TeamFactory)
 
 # Register assignment factories
 register(CategoryFactory)
+register(AssignmentTargetFactory, 'assignment_target')
 
 
 @pytest.fixture
