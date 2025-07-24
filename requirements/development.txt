@@ -1,1 +1,3 @@
 -r base.txt
+
+factory-boy==3.3.0
