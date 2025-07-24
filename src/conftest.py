@@ -1,11 +1,13 @@
 import pytest
 from pytest_factoryboy import register
 
-from users.factories import SiteFactory, UserFactory
+from users.factories import AdminUserFactory, RegularUserFactory, SiteFactory, TeamFactory
 
 # Register user factories
-register(UserFactory)
+register(AdminUserFactory, 'admin_user')
+register(RegularUserFactory, 'regular_user')
 register(SiteFactory)
+register(TeamFactory)
 
 
 @pytest.fixture
