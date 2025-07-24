@@ -2,6 +2,7 @@ import pytest
 from pytest_factoryboy import register
 
 from assignments.factories import AssignmentFactory, AssignmentTargetFactory, CategoryFactory
+from playbooks.factories import PlaybookAssignmentFactory
 from users.factories import AdminUserFactory, RegularUserFactory, SiteFactory, TeamFactory
 
 # Register user factories
@@ -14,6 +15,9 @@ register(TeamFactory)
 register(CategoryFactory)
 register(AssignmentTargetFactory, 'assignment_target')
 register(AssignmentFactory)
+
+# Register playbook factories
+register(PlaybookAssignmentFactory)
 
 
 @pytest.fixture
