@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand, CommandError
 
-from assignments.factories import CategoryFactory
+from assignments.factories import RealisticCategoryFactory
 
 
 class Command(BaseCommand):
@@ -19,6 +19,6 @@ class Command(BaseCommand):
         if not isinstance(count, int) or count < 1:
             raise CommandError('The --count argument must be an integer value greater than or equal to 1.')
 
-        categories = CategoryFactory.create_batch(count)
+        categories = RealisticCategoryFactory.create_batch(count)
         category_ids = ','.join(str(category.pk) for category in categories)
         self.stdout.write(category_ids)
