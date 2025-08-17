@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand, CommandError
 
-from users.factories import TeamFactory
+from users.factories import RealisticTeamFactory
 
 
 class Command(BaseCommand):
@@ -19,6 +19,6 @@ class Command(BaseCommand):
         if not isinstance(count, int) or count < 1:
             raise CommandError('The --count argument must be an integer value greater than or equal to 1.')
 
-        created_teams = TeamFactory.create_batch(count)
+        created_teams = RealisticTeamFactory.create_batch(count)
         created_teams_output = ','.join([str(team.pk) for team in created_teams])
         self.stdout.write(created_teams_output)

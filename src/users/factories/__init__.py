@@ -1,3 +1,3 @@
 from .site import SiteFactory
-from .team import TeamFactory
+from .team import RealisticTeamFactory, TeamFactory
 from .user import AdminUserFactory, RegularUserFactory
