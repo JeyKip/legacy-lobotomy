@@ -66,6 +66,6 @@ class RetryableDjangoModelFactory(factory.django.DjangoModelFactory):
 
         # If we exhaust our retries, raise an error.
         raise FactoryRetryExceededError(
-            f"Failed to create {cls._meta.model.__name__} after {cls._meta.max_retry_attempts} attempts "
-            f"due to repeated IntegrityError."
+            f'Failed to create {cls._meta.model.__name__} after {cls._meta.max_retry_attempts} attempts '
+            f'due to repeated IntegrityError.'
         )
