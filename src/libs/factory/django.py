@@ -40,7 +40,11 @@ class RetryableDjangoModelFactory(factory.django.DjangoModelFactory):
         abstract = True
 
     @classmethod
-    def _create(cls, model_class, *args, **kwargs):
+    def _generate(cls, strategy, params):
+        # Only retry on create; let build and stub go through normally
+        if strategy != factory.enums.CREATE_STRATEGY:
+            return super()._generate(strategy, params)
+
         for _ in range(cls._meta.max_retry_attempts):
             try:
                 # Without this atomic() scoping, once we hit an
@@ -54,7 +58,7 @@ class RetryableDjangoModelFactory(factory.django.DjangoModelFactory):
                 # the official Django documentation:
                 # https://docs.djangoproject.com/en/3.2/topics/db/transactions/#controlling-transactions-explicitly
                 with transaction.atomic():
-                    return super()._create(model_class, *args, **kwargs)
+                    return super()._generate(strategy, params)
             except IntegrityError:
                 # If an IntegrityError occurs, we catch it and retry
                 # until we've exhausted the maximum number of attempts.
@@ -62,6 +66,6 @@ class RetryableDjangoModelFactory(factory.django.DjangoModelFactory):
 
         # If we exhaust our retries, raise an error.
         raise FactoryRetryExceededError(
-            f"Failed to create {model_class.__name__} after {cls._meta.max_retry_attempts} attempts "
+            f"Failed to create {cls._meta.model.__name__} after {cls._meta.max_retry_attempts} attempts "
             f"due to repeated IntegrityError."
         )
