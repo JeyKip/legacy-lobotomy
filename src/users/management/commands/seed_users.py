@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand, CommandError
 
-from users.factories import RegularUserFactory
+from users.factories import RealisticRegularUserFactory
 from users.models import Team
 
 
@@ -32,7 +32,7 @@ class Command(BaseCommand):
             team = self._parse_team(**options)
 
             # If a team wasn't provided, assign the user to a random team.
-            created_users = [RegularUserFactory(team=team or self._fetch_random_team()) for _ in range(count)]
+            created_users = [RealisticRegularUserFactory(team=team or self._fetch_random_team()) for _ in range(count)]
         except Team.DoesNotExist:
             raise CommandError('The team does not exist.')
 

@@ -1,10 +1,14 @@
 import uuid
 
 import factory
+import faker
 from django.contrib.auth import get_user_model
+from faker.utils.text import slugify
 
-from .team import TeamFactory
+from libs.factory.django import RetryableDjangoModelFactory
+from .team import RealisticTeamFactory, TeamFactory
 
+fake = faker.Faker()
 User = get_user_model()
 
 
@@ -34,3 +38,18 @@ class RegularUserFactory(UserFactory):
     is_superuser = False
     is_staff = False
     team = factory.SubFactory(TeamFactory)
+
+
+class RealisticRegularUserFactory(RetryableDjangoModelFactory, RegularUserFactory):
+    class Meta:
+        model = User
+
+    team = factory.SubFactory(RealisticTeamFactory)
+
+    @factory.lazy_attribute
+    def email(self):
+        first_name = slugify(self.first_name)
+        last_name = slugify(self.last_name)
+        team_name = slugify(self.team.name)
+
+        return f'{first_name}.{last_name}@{team_name}.{fake.tld()}'
