@@ -11,6 +11,19 @@ services:
       - POSTGRES_PASSWORD=legacy-lobotomy-password
     ports:
       - "5432:5432"
-
+  mailpit:
+    image: axllent/mailpit
+    restart: no
+    volumes:
+      - mailpit:/data
+    ports:
+      - "8025:8025"  # Web UI
+      - "1025:1025"  # SMTP server
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
 volumes:
   db:
+  mailpit:
