@@ -1,3 +1,4 @@
 -r base.txt
 
 factory-boy==3.3.0
+django-silk==5.0.3

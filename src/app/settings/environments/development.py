@@ -5,3 +5,4 @@ read_env()
 from ..configs.base import *
 from ..configs.smtp import *
 from ..configs.media import *
+from ..configs.silk import *
