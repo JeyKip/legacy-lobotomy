@@ -1,0 +1,859 @@
+{
+	"info": {
+		"_postman_id": "ff38cc04-5d3f-4cab-8e9f-e74cd33aeb21",
+		"name": "Legacy Lobotomy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7436886"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Log In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while logging in.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"auth_token\", json.key);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{USER_EMAIL}}\",\n    \"password\": \"{{USER_PASSWORD}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/login/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Log Out",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while logging out.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"pm.collectionVariables.unset(\"auth_token\");"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/auth/logout/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"logout",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while requesting the password reset.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"const mailpitWebUrl = pm.environment.get(\"MAILPIT_WEB_URL\");",
+									"",
+									"if (!mailpitWebUrl) {",
+									"    console.error(\"MAILPIT_WEB_URL is not defined.\");",
+									"    return;",
+									"}",
+									"",
+									"pm.sendRequest(",
+									"  {",
+									"    url: `${mailpitWebUrl}/api/v1/message/latest`,",
+									"    method: \"GET\",",
+									"    header: {",
+									"      Accept: \"application/json\"",
+									"    }",
+									"  },",
+									"  function (err, res) {",
+									"    if (err) {",
+									"      console.error(\"Failed to fetch latest message:\", err);",
+									"      return;",
+									"    }",
+									"",
+									"    const json = res.json();",
+									"    const htmlBody = json.HTML || \"\";",
+									"",
+									"    if (!htmlBody) {",
+									"      console.error(\"No HTML body found in email\");",
+									"      return;",
+									"    }",
+									"",
+									"    // Regex to extract uid and token from the reset link",
+									"    const regex =",
+									"      /password-reset-confirm\\/([^\\/]+)\\/([^\\/]+)\\//;",
+									"",
+									"    const match = htmlBody.match(regex);",
+									"",
+									"    if (!match) {",
+									"      console.error(\"Password reset link not found in email body\");",
+									"      return;",
+									"    }",
+									"",
+									"    const uid = match[1];",
+									"    const token = match[2];",
+									"",
+									"    // Store in collection variables",
+									"    pm.collectionVariables.set(\"reset_password_uid\", uid);",
+									"    pm.collectionVariables.set(\"reset_password_token\", token);",
+									"  }",
+									");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{USER_EMAIL}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/password/reset/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"password",
+								"reset",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password Confirm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while resetting the password.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"pm.collectionVariables.unset(\"reset_password_uid\");",
+									"pm.collectionVariables.unset(\"reset_password_token\");",
+									"",
+									"const currentPassword = pm.environment.get(\"USER_PASSWORD\");",
+									"const resetPassword = pm.environment.get(\"USER_RESET_PASSWORD\");",
+									"",
+									"pm.environment.set(\"USER_PASSWORD\", resetPassword);",
+									"pm.environment.set(\"USER_RESET_PASSWORD\", currentPassword);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"new_password1\": \"{{USER_RESET_PASSWORD}}\",\n    \"new_password2\": \"{{USER_RESET_PASSWORD}}\",\n    \"uid\": \"{{reset_password_uid}}\",\n    \"token\": \"{{reset_password_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/password/reset/confirm/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"password",
+								"reset",
+								"confirm",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while changing the password.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"const currentPassword = pm.environment.get(\"USER_PASSWORD\");",
+									"const changePassword = pm.environment.get(\"USER_CHANGE_PASSWORD\");",
+									"",
+									"pm.environment.set(\"USER_PASSWORD\", changePassword);",
+									"pm.environment.set(\"USER_CHANGE_PASSWORD\", currentPassword);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"old_password\": \"{{USER_PASSWORD}}\",\n    \"new_password1\": \"{{USER_CHANGE_PASSWORD}}\",\n    \"new_password2\": \"{{USER_CHANGE_PASSWORD}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/password/change/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"password",
+								"change",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get User Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while user details.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"const user = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"user_first_name\", user.first_name);",
+									"pm.collectionVariables.set(\"user_last_name\", user.last_name);",
+									"pm.collectionVariables.set(\"user_age\", user.age);",
+									"pm.collectionVariables.set(\"user_gender\", user.gender);",
+									"pm.collectionVariables.set(\"user_guardian_email\", user.guardian_email);",
+									"pm.collectionVariables.set(\"user_activity\", user.activity);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/auth/user/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"user",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Details",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"{{user_first_name}}\",\n    \"last_name\": \"{{user_last_name}}\",\n    \"age\": {{user_age}},\n    \"gender\": \"{{user_gender}}\",\n    \"guardian_email\": \"{{user_guardian_email}}\",\n    \"activity\": \"{{user_activity}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/auth/user/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"user",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while deleting the user.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"pm.collectionVariables.clear();"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/auth/user/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"user",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Terms and Conditions",
+			"item": [
+				{
+					"name": "Get Terms & Conditions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while fetching terms and conditions.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"const terms_and_conditions = pm.response.json();",
+									"",
+									"if (!terms_and_conditions?.length) {",
+									"    console.error(\"There are no terms and conditions.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"pm.collectionVariables.set(\"terms_and_conditions_id\", terms_and_conditions[0].id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/terms-conditions/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"terms-conditions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Terms & Conditions",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accepted_terms_cond\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/terms-conditions/{{terms_and_conditions_id}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"terms-conditions",
+								"{{terms_and_conditions_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get Category List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while fetching categories.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"const categories = pm.response.json();",
+									"",
+									"if (!categories?.length) {",
+									"    console.error(\"There are no categories.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"pm.collectionVariables.set(\"category_id\", categories[0].id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/categories/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/categories/{{category_id}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								"{{category_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Team Dashboard",
+			"item": [
+				{
+					"name": "Get Team Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/team-dashboard/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"team-dashboard",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Discover",
+			"item": [
+				{
+					"name": "Get Available Assignments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while fetching available assignments.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"const assignments = pm.response.json();",
+									"",
+									"if (!assignments?.length) {",
+									"    console.error(\"There are no available assignments for the current user.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"pm.collectionVariables.set(\"next_assignment_id\", assignments[0].id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/discover/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"discover",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complete Assignment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code >= 400) {",
+									"    console.error(\"An error occurred while fetching available assignments.\", pm.response);",
+									"    return;",
+									"}",
+									"",
+									"pm.collectionVariables.unset(\"next_assignment_id\");"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"is_completed\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/discover/{{next_assignment_id}}/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"discover",
+								"{{next_assignment_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Playbook",
+			"item": [
+				{
+					"name": "Get Playbook",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/playbook/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"playbook",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "terms_and_conditions_id",
+			"value": ""
+		},
+		{
+			"key": "category_id",
+			"value": ""
+		},
+		{
+			"key": "auth_token",
+			"value": ""
+		},
+		{
+			"key": "user_first_name",
+			"value": ""
+		},
+		{
+			"key": "user_last_name",
+			"value": ""
+		},
+		{
+			"key": "user_age",
+			"value": ""
+		},
+		{
+			"key": "user_gender",
+			"value": ""
+		},
+		{
+			"key": "user_guardian_email",
+			"value": ""
+		},
+		{
+			"key": "user_activity",
+			"value": ""
+		},
+		{
+			"key": "next_assignment_id",
+			"value": ""
+		},
+		{
+			"key": "reset_password_uid",
+			"value": ""
+		},
+		{
+			"key": "reset_password_token",
+			"value": ""
+		}
+	]
+}
