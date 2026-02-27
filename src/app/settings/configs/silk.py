@@ -1,7 +1,7 @@
 from .base import INSTALLED_APPS, MIDDLEWARE
 
 INSTALLED_APPS = INSTALLED_APPS + ['silk']
-MIDDLEWARE = ['silk.middleware.SilkyMiddleware'] + MIDDLEWARE
+MIDDLEWARE = ['libs.silk.middleware.SilkyMiddleware'] + MIDDLEWARE
 # Authentication: require login to access Silk UI
 SILKY_AUTHENTICATION = True
 # Authorization: only staff users can access Silk UI (is_staff=True)
